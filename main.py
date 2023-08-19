@@ -25,7 +25,7 @@ def root():
 
 @app.get("/news")
 def root():
-    return{news}
+    return{f"{news}"}
 
 app.add_middleware(
 CORSMiddleware,
