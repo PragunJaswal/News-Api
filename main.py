@@ -15,17 +15,19 @@ origins = [
 html_text = requests.get('https://timesofindia.indiatimes.com/?from=mdr').text
 soup = BeautifulSoup(html_text,'lxml')
 tags = soup.find_all('figcaption')
-news=[]
+news = []
 for new in tags:
-    news.append(new.text)
+    news.append({"title": new.text})
 
+
+print(news)
 @app.get("/")
 def root():
     return{"Server is running"}
 
 @app.get("/news")
 def root():
-    return{f"{news}"}
+    return news
 
 app.add_middleware(
 CORSMiddleware,
