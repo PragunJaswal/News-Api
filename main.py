@@ -58,7 +58,6 @@ for title,des, link, img_link in zip(tit,desc, news, link):
     }
     news_list.append(news_item)
 
-print(news_list)
 
 
 @app.get("/")
