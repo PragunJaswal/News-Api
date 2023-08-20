@@ -12,22 +12,66 @@ origins = [
     "http://localhost:8080",
 ]
 
-html_text = requests.get('https://timesofindia.indiatimes.com/?from=mdr').text
+html_text = requests.get('https://www.ndtv.com/india').text
 soup = BeautifulSoup(html_text,'lxml')
-tags = soup.find_all('figcaption')
+tags = soup.find_all('h2')
+# print(tags)
+tit = []
 news = []
 for new in tags:
-    news.append({"title": new.text})
+    title_tag = new.find('a')  # Find the <a> tag
+    if title_tag:
+        title = title_tag.text  # Extract the title
+        link = title_tag['href']  # Extract the link
+        tit.append(title)
+        news.append(link)
+        
+        # news.append({"title": title, "link": link})
+    
+
+des = soup.find_all('p')
+# print(tags)
+desc = []
+for des in des:
+    desc.append(des.text)
 
 
-print(news)
+link = soup.find('div',{'class':'row s-lmr mt-10'})
+divlink = link.find_all(class_='news_Itm-img')
+
+# print (divlink)
+link = []
+for img in divlink:
+    images =img.find('img')
+    img_src = images.get('src')
+    link.append(img_src)
+
+# Combine all
+
+news_list=[]
+for title,des, link, img_link in zip(tit,desc, news, link):
+    news_item = {
+        "title": title,
+        "description":des,
+        "link": link,
+        "img_link": img_link
+    }
+    news_list.append(news_item)
+
+print(news_list)
+
+
 @app.get("/")
 def root():
     return{"Server is running"}
 
+@app.get("/developer")
+def root():
+    return{"This news server is made by Pragun jaswal"}
+
 @app.get("/news")
 def root():
-    return news
+    return news_list
 
 app.add_middleware(
 CORSMiddleware,
