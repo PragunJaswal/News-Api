@@ -6,71 +6,76 @@ from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-origins = [
-    "https://news-api-vaqm.onrender.com/news",
-    "http://localhost",
-    "http://localhost:8080",
-]
-
-html_text = requests.get('https://www.ndtv.com/india').text
-soup = BeautifulSoup(html_text,'lxml')
-tags = soup.find_all('h2')
-# print(tags)
-tit = []
-news = []
-for new in tags:
-    title_tag = new.find('a')  # Find the <a> tag
-    if title_tag:
-        title = title_tag.text  # Extract the title
-        link = title_tag['href']  # Extract the link
-        tit.append(title)
-        news.append(link)
-        
-        # news.append({"title": title, "link": link})
+def scrape_news(url):
+    html_text = requests.get(url).text
+    soup = BeautifulSoup(html_text, 'lxml')
+    tags = soup.find_all('h2')
     
+    news_list = []
+    for tag in tags:
+        title_tag = tag.find('a')
+        if title_tag:
+            title = title_tag.text
+            link = title_tag['href']
+            
+            description_tag = tag.find_next('p')
+            if description_tag:
+                description = description_tag.text
+            else:
+                description = ""
+            
+            image_container = tag.find_next(class_='news_Itm-img')
+            img_link = ""
+            if image_container:
+                image_tag = image_container.find('img')
+                if image_tag:
+                    img_link = image_tag.get('src')
+            
+            news_item = {
+                "title": title,
+                "description": description,
+                "link": link,
+                "img_link": img_link
+            }
+            news_list.append(news_item)
+    
+    return news_list
 
-des = soup.find_all('p')
-# print(tags)
-desc = []
-for des in des:
-    desc.append(des.text)
-
-
-link = soup.find('div',{'class':'row s-lmr mt-10'})
-divlink = link.find_all(class_='news_Itm-img')
-
-# print (divlink)
-link = []
-for img in divlink:
-    images =img.find('img')
-    img_src = images.get('src')
-    link.append(img_src)
-
-# Combine all
-
-news_list=[]
-for title,des, link, img_link in zip(tit,desc, news, link):
-    news_item = {
-        "title": title,
-        "description":des,
-        "link": link,
-        "img_link": img_link
-    }
-    news_list.append(news_item)
-
-
+news_latest = scrape_news('https://www.ndtv.com/latest')
+news_india = scrape_news('https://www.ndtv.com/india')
+news_education = scrape_news('https://www.ndtv.com/education')
+news_world = scrape_news('https://www.ndtv.com/world-news')
+news_science = scrape_news('https://www.ndtv.com/science')
 
 @app.get("/")
 def root():
-    return{"Server is running"}
+    return {"Server is running"}
 
 @app.get("/developer")
-def root():
-    return{"This news server is made by Pragun jaswal"}
+def developer_info():
+    return {"developer": "This news server is made by Pragun Jaswal"}
+
 
 @app.get("/news")
-def root():
-    return news_list
+def get_news_latest():
+    return news_latest
+
+@app.get("/news-india")
+def get_news_india():
+    return news_india
+
+@app.get("/news-education")
+def get_news_education():
+    return news_education
+
+@app.get("/news-world")
+def get_news_world():
+    return news_world
+
+@app.get("/news-science")
+def get_news_science():
+    return news_science
+
 
 app.add_middleware(
 CORSMiddleware,
