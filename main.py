@@ -10,6 +10,7 @@ origins = [
     "https://news-api-vaqm.onrender.com/news",
     "http://localhost",
     "http://localhost:8080",
+    "https://monumental-palmier-ac3734.netlify.app/"
 ]
 
 
