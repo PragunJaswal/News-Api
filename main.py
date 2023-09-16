@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 from fastapi import FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -12,6 +13,9 @@ origins = [
     "http://localhost:8080",
     "https://monumental-palmier-ac3734.netlify.app/"
 ]
+
+class item(BaseModel):
+    title :str
 
 
 def scrape_news(url):
@@ -69,6 +73,7 @@ news_science = scrape_news('https://www.ndtv.com/science')
 
 # print(news_latest)
 
+
 @app.get("/news")
 def get_news_latest():
     return news_latest
@@ -88,6 +93,38 @@ def get_news_world():
 @app.get("/news-science")
 def get_news_science():
     return news_science
+
+
+# below are used for display
+@app.get("/news-top")
+def get_news_top():
+    first_3_titles = [news['title'] for news in news_latest[:3]]
+    return first_3_titles
+
+
+notice=""
+@app.post("/post/notice")
+def post_notice(data: item):
+    global notice
+    notice = data
+    return f"Success: Notice updated to '{notice}'"
+
+@app.get("/get/notice")
+def get_notice():
+    global notice
+    return notice
+
+toggle_state = False
+
+@app.get("/toggle")
+def toggle_state_endpoint(state: bool = None):
+    global toggle_state
+    
+    # If state is provided as a query parameter, use it to update the toggle state
+    if state is not None:
+        toggle_state = state
+    
+    return {"state": toggle_state}
 
 app.add_middleware(
     CORSMiddleware,
