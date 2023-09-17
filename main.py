@@ -17,7 +17,6 @@ origins = [
 class item(BaseModel):
     title :str
 
-
 def scrape_news(url):
     html_text = requests.get(url).text
     soup = BeautifulSoup(html_text, 'lxml')
@@ -98,9 +97,9 @@ def get_news_science():
 # below are used for display
 @app.get("/news-top")
 def get_news_top():
-    first_1_titles = [news['title'] for news in news_latest[:1]]
-    return first_1_titles
-
+    first_1_titles = [news['title'] for news in news_india[:1]]
+    final = f"News : {first_1_titles[0]}"
+    return final
 
 notice=""
 @app.post("/post/notice")
