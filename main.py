@@ -98,8 +98,8 @@ def get_news_science():
 # below are used for display
 @app.get("/news-top")
 def get_news_top():
-    first_3_titles = [news['title'] for news in news_latest[:3]]
-    return first_3_titles
+    first_1_titles = [news['title'] for news in news_latest[:1]]
+    return first_1_titles
 
 
 notice=""
@@ -119,8 +119,6 @@ toggle_state = False
 @app.get("/toggle")
 def toggle_state_endpoint(state: bool = None):
     global toggle_state
-    
-    # If state is provided as a query parameter, use it to update the toggle state
     if state is not None:
         toggle_state = state
     
