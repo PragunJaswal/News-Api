@@ -15,7 +15,7 @@ origins = [
 ]
 
 class item(BaseModel):
-    title :str
+    Notice :str
 
 def scrape_news(url):
     html_text = requests.get(url).text
@@ -101,7 +101,7 @@ def get_news_top():
     final = f"News : {first_1_titles[0]}"
     return final
 
-notice=""
+
 @app.post("/post/notice")
 def post_notice(data: item):
     global notice
@@ -111,7 +111,8 @@ def post_notice(data: item):
 @app.get("/get/notice")
 def get_notice():
     global notice
-    return notice
+    return notice 
+
 
 toggle_state = False
 
