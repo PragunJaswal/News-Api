@@ -101,7 +101,7 @@ def get_news_top():
     final = f"News : {first_1_titles[0]}"
     return final
 
-
+notice = ""
 @app.post("/post/notice")
 def post_notice(data: item):
     global notice
