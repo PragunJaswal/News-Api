@@ -3,4 +3,5 @@ requests
 bs4
 lxml
 starlette
+pydantic
 uvicorn == 0.21.1
