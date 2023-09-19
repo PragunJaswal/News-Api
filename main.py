@@ -1,8 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from starlette.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import time
+import threading
 
 app = FastAPI()
 
@@ -71,6 +73,35 @@ news_world = scrape_news('https://www.ndtv.com/world-news')
 news_science = scrape_news('https://www.ndtv.com/science')
 
 # print(news_latest)
+# Define a function to periodically fetch and print the API response
+def print_api_response():
+    api_url = "https://news-api-vaqm.onrender.com/"
+    while True:
+        try:
+            # Make a GET request to the API
+            response = requests.get(api_url)
+
+            # Check if the request was successful (status code 200)
+            if response.status_code == 200:
+                # Print the API response content
+                print(response.text)
+            else:
+                print(f"Failed to fetch data. Status code: {response.status_code}")
+
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
+
+        # Wait for 5 seconds before making the next request
+        time.sleep(60)
+
+
+# Create a background thread to run the print_api_response function
+background_thread = threading.Thread(target=print_api_response)
+
+# Start the background thread when the application starts
+@app.on_event("startup")
+def on_startup():
+    background_thread.start()
 
 
 @app.get("/news")
